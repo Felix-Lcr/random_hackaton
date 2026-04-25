@@ -18,6 +18,7 @@ def main():
 
     def roll_all():
         for d in dice_row:
+            d.selected = False
             d.roll()
     roll_btn = Button((config.WIDTH // 2 - 100, 500, 200, 60), 'ROULER', on_click=roll_all)
     roll_all()
@@ -31,6 +32,11 @@ def main():
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 running = False
             roll_btn.enabled = not any((d.rolling for d in dice_row))
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and roll_btn.enabled:
+                for d in dice_row:
+                    if d.contains(event.pos):
+                        d.toggle_select()
+                        break
             roll_btn.handle(event)
         for d in dice_row:
             d.update()

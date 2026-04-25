@@ -19,6 +19,7 @@ class Die:
         self.faces = faces
         self.value = value
         self.roll_timer = 0
+        self.selected = False
 
     @property
     def rect(self):
@@ -30,6 +31,13 @@ class Die:
 
     def roll(self):
         self.roll_timer = config.ROLL_FRAMES
+
+    def toggle_select(self):
+        if not self.rolling:
+            self.selected = not self.selected
+
+    def contains(self, pos):
+        return self.rect.collidepoint(pos)
 
     def update(self):
         if self.roll_timer > 0:
@@ -47,6 +55,9 @@ class Die:
             x += random.randint(-3, 3)
             y += random.randint(-3, 3)
         surface.blit(img, (x, y))
+        if self.selected:
+            border = pygame.Rect(x, y, self.size, self.size)
+            pygame.draw.rect(surface, config.DICE_SELECTED_BORDER, border, 5, border_radius=10)
 
 def make_row(count=None, faces=None):
     count = count or config.DICE_COUNT_DEFAULT
