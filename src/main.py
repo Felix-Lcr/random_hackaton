@@ -1,12 +1,14 @@
 import sys
 import pygame
 import config
+import arena
 
 def main():
     pygame.init()
     screen = pygame.display.set_mode((config.WIDTH, config.HEIGHT))
     pygame.display.set_caption(config.TITLE)
     clock = pygame.time.Clock()
+    t = 0
     running = True
     while running:
         clock.tick(config.FPS)
@@ -15,7 +17,8 @@ def main():
                 running = False
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 running = False
-        screen.fill(config.BG)
+        arena.draw(screen, t)
+        t += 1
         pygame.display.flip()
     pygame.quit()
     sys.exit()
