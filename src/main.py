@@ -2,12 +2,16 @@ import sys
 import pygame
 import config
 import arena
+from hero import Hero
+from enemy import Enemy
 
 def main():
     pygame.init()
     screen = pygame.display.set_mode((config.WIDTH, config.HEIGHT))
     pygame.display.set_caption(config.TITLE)
     clock = pygame.time.Clock()
+    hero = Hero()
+    enemy = Enemy()
     t = 0
     running = True
     while running:
@@ -18,6 +22,8 @@ def main():
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 running = False
         arena.draw(screen, t)
+        hero.draw(screen)
+        enemy.draw(screen)
         t += 1
         pygame.display.flip()
     pygame.quit()
