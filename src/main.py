@@ -30,7 +30,10 @@ def main():
                 running = False
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 running = False
+            roll_btn.enabled = not any((d.rolling for d in dice_row))
             roll_btn.handle(event)
+        for d in dice_row:
+            d.update()
         arena.draw(screen, t)
         hero.draw(screen)
         enemy.draw(screen)

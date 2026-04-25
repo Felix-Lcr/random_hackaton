@@ -18,19 +18,35 @@ class Die:
         self.size = config.DICE_SIZE
         self.faces = faces
         self.value = value
+        self.roll_timer = 0
 
     @property
     def rect(self):
         return pygame.Rect(self.x, self.y, self.size, self.size)
 
+    @property
+    def rolling(self):
+        return self.roll_timer > 0
+
     def roll(self):
-        self.value = random.randint(1, self.faces)
+        self.roll_timer = config.ROLL_FRAMES
+
+    def update(self):
+        if self.roll_timer > 0:
+            self.value = random.randint(1, self.faces)
+            self.roll_timer -= 1
+            if self.roll_timer == 0:
+                self.value = random.randint(1, self.faces)
 
     def draw(self, surface):
         img = _sprite(self.faces, self.value)
         if img is None:
             return
-        surface.blit(img, (self.x, self.y))
+        x, y = (self.x, self.y)
+        if self.rolling:
+            x += random.randint(-3, 3)
+            y += random.randint(-3, 3)
+        surface.blit(img, (x, y))
 
 def make_row(count=None, faces=None):
     count = count or config.DICE_COUNT_DEFAULT
