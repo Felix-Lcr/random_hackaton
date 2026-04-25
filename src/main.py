@@ -4,6 +4,7 @@ import config
 import arena
 from hero import Hero
 from enemy import Enemy
+import dice
 
 def main():
     pygame.init()
@@ -12,6 +13,7 @@ def main():
     clock = pygame.time.Clock()
     hero = Hero()
     enemy = Enemy()
+    dice_row = dice.make_row()
     t = 0
     running = True
     while running:
@@ -24,6 +26,8 @@ def main():
         arena.draw(screen, t)
         hero.draw(screen)
         enemy.draw(screen)
+        for d in dice_row:
+            d.draw(screen)
         t += 1
         pygame.display.flip()
     pygame.quit()
