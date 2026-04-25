@@ -1,3 +1,4 @@
+import random
 import pygame
 import config
 import assets_loader
@@ -21,6 +22,9 @@ class Die:
     @property
     def rect(self):
         return pygame.Rect(self.x, self.y, self.size, self.size)
+
+    def roll(self):
+        self.value = random.randint(1, self.faces)
 
     def draw(self, surface):
         img = _sprite(self.faces, self.value)

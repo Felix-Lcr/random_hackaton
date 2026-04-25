@@ -5,6 +5,7 @@ import arena
 from hero import Hero
 from enemy import Enemy
 import dice
+from ui import Button
 
 def main():
     pygame.init()
@@ -14,6 +15,12 @@ def main():
     hero = Hero()
     enemy = Enemy()
     dice_row = dice.make_row()
+
+    def roll_all():
+        for d in dice_row:
+            d.roll()
+    roll_btn = Button((config.WIDTH // 2 - 100, 500, 200, 60), 'ROULER', on_click=roll_all)
+    roll_all()
     t = 0
     running = True
     while running:
@@ -23,11 +30,13 @@ def main():
                 running = False
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 running = False
+            roll_btn.handle(event)
         arena.draw(screen, t)
         hero.draw(screen)
         enemy.draw(screen)
         for d in dice_row:
             d.draw(screen)
+        roll_btn.draw(screen)
         t += 1
         pygame.display.flip()
     pygame.quit()
