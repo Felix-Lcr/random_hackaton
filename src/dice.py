@@ -13,6 +13,8 @@ def _sprite(faces, value):
 class Die:
 
     def __init__(self, x, y, faces=6, value=1):
+        self.home_x = x
+        self.home_y = y
         self.x = x
         self.y = y
         self.size = config.DICE_SIZE
@@ -20,6 +22,7 @@ class Die:
         self.value = value
         self.roll_timer = 0
         self.selected = False
+        self.assigned_to = None
 
     @property
     def rect(self):
@@ -33,8 +36,12 @@ class Die:
         self.roll_timer = config.ROLL_FRAMES
 
     def toggle_select(self):
-        if not self.rolling:
+        if not self.rolling and self.assigned_to is None:
             self.selected = not self.selected
+
+    def return_home(self):
+        self.x = self.home_x
+        self.y = self.home_y
 
     def contains(self, pos):
         return self.rect.collidepoint(pos)
@@ -62,6 +69,10 @@ class Die:
 def make_row(count=None, faces=None):
     count = count or config.DICE_COUNT_DEFAULT
     faces = faces or config.DICE_FACES_DEFAULT
+    return make_row_with([faces] * count)
+
+def make_row_with(faces_list):
+    count = len(faces_list)
     total_w = count * config.DICE_SIZE + (count - 1) * config.DICE_GAP
     x0 = (config.WIDTH - total_w) // 2
-    return [Die(x0 + i * (config.DICE_SIZE + config.DICE_GAP), config.DICE_TRAY_Y, faces=faces, value=1) for i in range(count)]
+    return [Die(x0 + i * (config.DICE_SIZE + config.DICE_GAP), config.DICE_TRAY_Y, faces=f, value=1) for i, f in enumerate(faces_list)]

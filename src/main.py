@@ -5,6 +5,7 @@ import arena
 from hero import Hero
 from enemy import Enemy
 import dice
+import slots as slots_mod
 from ui import Button
 
 def main():
@@ -15,13 +16,21 @@ def main():
     hero = Hero()
     enemy = Enemy()
     dice_row = dice.make_row()
+    slots = slots_mod.make_slots()
 
     def roll_all():
+        for s in slots:
+            s.clear()
         for d in dice_row:
             d.selected = False
+            d.assigned_to = None
+            d.return_home()
             d.roll()
     roll_btn = Button((config.WIDTH // 2 - 100, 500, 200, 60), 'ROULER', on_click=roll_all)
     roll_all()
+
+    def first_selected():
+        return next((d for d in dice_row if d.selected), None)
     t = 0
     running = True
     while running:
@@ -34,15 +43,24 @@ def main():
             roll_btn.enabled = not any((d.rolling for d in dice_row))
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and roll_btn.enabled:
                 for d in dice_row:
-                    if d.contains(event.pos):
+                    if d.assigned_to is None and d.contains(event.pos):
                         d.toggle_select()
                         break
+                else:
+                    sel = first_selected()
+                    if sel:
+                        for s in slots:
+                            if s.contains(event.pos):
+                                s.accept(sel)
+                                break
             roll_btn.handle(event)
         for d in dice_row:
             d.update()
         arena.draw(screen, t)
         hero.draw(screen)
         enemy.draw(screen)
+        for s in slots:
+            s.draw(screen)
         for d in dice_row:
             d.draw(screen)
         roll_btn.draw(screen)
