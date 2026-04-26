@@ -7,6 +7,7 @@ import dice
 import slots as slots_mod
 import combat
 from ui import Button
+from rewards import RewardScreen
 
 class Game:
 
@@ -16,8 +17,8 @@ class Game:
         self.reset()
         self.roll_btn = Button((config.WIDTH // 2 - 220, 500, 200, 60), 'RELANCER', on_click=self._re_roll)
         self.end_btn = Button((config.WIDTH // 2 + 20, 500, 200, 60), 'FIN DU TOUR', on_click=self._end_turn)
-        self.next_btn = Button((config.WIDTH // 2 - 130, config.HEIGHT // 2 + 60, 260, 55), 'COMBAT SUIVANT', on_click=self._next_fight)
         self.restart_btn = Button((config.WIDTH // 2 - 110, config.HEIGHT // 2 + 60, 220, 55), 'REJOUER', on_click=self.reset)
+        self.rewards = RewardScreen()
 
     def _start_fight(self):
         self.enemy = Enemy(level=self.fight_index + 1)
@@ -54,7 +55,8 @@ class Game:
             if self.fight_index >= config.DUNGEON_LENGTH:
                 self.phase = 'run_clear'
             else:
-                self.phase = 'next'
+                self.rewards.roll_offerings()
+                self.phase = 'reward'
             return
         self.phase = 'enemy'
         self.enemy_timer = config.ENEMY_TURN_DELAY
@@ -73,8 +75,8 @@ class Game:
         self._start_fight()
 
     def handle(self, event):
-        if self.phase == 'next':
-            self.next_btn.handle(event)
+        if self.phase == 'reward':
+            self.rewards.handle(event, self)
             return
         if self.phase in ('run_clear', 'lose'):
             self.restart_btn.handle(event)
@@ -130,9 +132,8 @@ class Game:
         if self.phase == 'enemy':
             t2 = self.font.render("L'ennemi prépare son attaque…", True, (255, 200, 100))
             surface.blit(t2, (config.WIDTH // 2 - t2.get_width() // 2, 260))
-        if self.phase == 'next':
-            self._overlay(surface, 'VICTOIRE !', config.GREEN)
-            self.next_btn.draw(surface)
+        if self.phase == 'reward':
+            self.rewards.draw(surface)
         elif self.phase == 'run_clear':
             self._overlay(surface, 'DONJON NETTOYÉ !', config.GREEN)
             self.restart_btn.draw(surface)
