@@ -2,18 +2,20 @@ import random
 import config
 import assets_loader
 import hp_bar
+ENEMY_NAMES = ['Gobelin', 'Orc', 'Squelette', 'Troll']
 
 class Enemy:
 
-    def __init__(self):
+    def __init__(self, level=1):
         self.x = config.ENEMY_X
         self.y = config.ENEMY_Y
-        self.hp = config.ENEMY_MAX_HP
-        self.max_hp = config.ENEMY_MAX_HP
-        self.name = 'Gobelin'
-        self.dice_count = config.ENEMY_DICE_COUNT
+        self.max_hp = config.ENEMY_MAX_HP + (level - 1) * 6
+        self.hp = self.max_hp
+        self.name = ENEMY_NAMES[(level - 1) % len(ENEMY_NAMES)]
+        self.dice_count = config.ENEMY_DICE_COUNT + (level - 1) // 2
         self.dice_faces = config.ENEMY_DICE_FACES
         self.last_roll = []
+        self.level = level
         self.sprite = assets_loader.load_image('enemy.png', size=(config.ENEMY_W, config.ENEMY_H))
 
     def roll_attack(self):
