@@ -17,6 +17,7 @@ class Slot:
         self.h = config.SLOT_H
         self.kind = kind
         self.dice = []
+        self.bonus_mult = 1.0
 
     @property
     def rect(self):
@@ -28,7 +29,8 @@ class Slot:
 
     @property
     def total(self):
-        return sum((d.value for d in self.dice))
+        raw = sum((d.value for d in self.dice))
+        return int(round(raw * self.bonus_mult))
 
     def contains(self, pos):
         return self.rect.collidepoint(pos)
@@ -59,6 +61,10 @@ class Slot:
         label = {'attack': 'ATTAQUE', 'defense': 'DÉFENSE', 'heal': 'SOIN'}[self.kind]
         t = font.render(label, True, self.color)
         surface.blit(t, (r.centerx - t.get_width() // 2, r.bottom + 4))
+        if self.bonus_mult > 1.0:
+            mfont = pygame.font.SysFont('Arial', 14, bold=True)
+            mt = mfont.render(f'×{self.bonus_mult:.2f}', True, (255, 180, 220))
+            surface.blit(mt, (r.right - mt.get_width() - 6, r.top + 4))
         if self.dice:
             big = pygame.font.SysFont('Arial', 34, bold=True)
             tot = big.render(f'{self.total}', True, self.color)
