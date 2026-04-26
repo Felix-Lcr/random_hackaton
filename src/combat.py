@@ -14,3 +14,11 @@ def resolve_player_turn(hero, enemy, slots):
             hero.block = total
             events.append(('block', total))
     return events
+
+def resolve_enemy_turn(hero, enemy):
+    raw = enemy.roll_attack()
+    absorbed = min(hero.block, raw)
+    dmg = raw - absorbed
+    hero.block = max(0, hero.block - raw)
+    hero.hp = max(0, hero.hp - dmg)
+    return {'raw': raw, 'absorbed': absorbed, 'dmg': dmg}

@@ -1,3 +1,4 @@
+import random
 import config
 import assets_loader
 import hp_bar
@@ -10,7 +11,14 @@ class Enemy:
         self.hp = config.ENEMY_MAX_HP
         self.max_hp = config.ENEMY_MAX_HP
         self.name = 'Gobelin'
+        self.dice_count = config.ENEMY_DICE_COUNT
+        self.dice_faces = config.ENEMY_DICE_FACES
+        self.last_roll = []
         self.sprite = assets_loader.load_image('enemy.png', size=(config.ENEMY_W, config.ENEMY_H))
+
+    def roll_attack(self):
+        self.last_roll = [random.randint(1, self.dice_faces) for _ in range(self.dice_count)]
+        return sum(self.last_roll)
 
     def draw(self, surface):
         if self.sprite is not None:
