@@ -2,7 +2,7 @@ import random
 import pygame
 import config
 import dice as dice_mod
-CARDS = [{'key': 'add_die', 'title': 'DÉ EN PLUS', 'desc': '+1d6 dans ton pool', 'color': (120, 200, 255)}, {'key': 'heal', 'title': 'POTION +10', 'desc': 'Récupère 10 HP', 'color': (120, 220, 140)}, {'key': 'max_hp', 'title': 'ENDURANCE', 'desc': '+8 HP max', 'color': (220, 130, 100)}, {'key': 'extra_roll', 'title': 'RELANCE BONUS', 'desc': '+1 relance par tour', 'color': (200, 220, 100)}, {'key': 'boost_slot', 'title': 'AMPLIFICATION', 'desc': '×1.2 sur tous les slots', 'color': (255, 180, 220)}]
+CARDS = [{'key': 'add_die', 'title': 'DÉ EN PLUS', 'desc': '+1d6 dans ton pool', 'color': (120, 200, 255)}, {'key': 'heal', 'title': 'POTION +10', 'desc': 'Récupère 10 HP', 'color': (120, 220, 140)}, {'key': 'upgrade_d6', 'title': 'AFFÛTER', 'desc': 'Un D6 devient un D8', 'color': (170, 220, 170)}, {'key': 'upgrade_d8', 'title': 'GRAVER RUNE', 'desc': 'Un D8 devient un D12', 'color': (210, 180, 240)}, {'key': 'extra_roll', 'title': 'RELANCE BONUS', 'desc': '+1 relance par tour', 'color': (200, 220, 100)}, {'key': 'boost_slot', 'title': 'AMPLIFICATION', 'desc': '×1.2 sur tous les slots', 'color': (255, 180, 220)}]
 
 class RewardScreen:
 
@@ -54,14 +54,22 @@ def apply_card(card, game):
     hero = game.hero
     if k == 'heal':
         hero.hp = min(hero.max_hp, hero.hp + 10)
-    elif k == 'max_hp':
-        hero.max_hp += 8
     elif k == 'add_die':
-        new_count = len(game.dice_row) + 1
-        game.dice_row = dice_mod.make_row(count=new_count)
+        faces_list = [d.faces for d in game.dice_row] + [6]
+        game.dice_row = dice_mod.make_row_with(faces_list)
+    elif k == 'upgrade_d6':
+        _upgrade_first(game, from_faces=6, to_faces=8)
+    elif k == 'upgrade_d8':
+        _upgrade_first(game, from_faces=8, to_faces=12)
     elif k == 'extra_roll':
         game.max_rerolls += 1
     elif k == 'boost_slot':
         for s in game.slots:
             s.bonus_mult *= 1.2
     game._next_fight()
+
+def _upgrade_first(game, from_faces, to_faces):
+    for d in game.dice_row:
+        if d.faces == from_faces:
+            d.faces = to_faces
+            break
