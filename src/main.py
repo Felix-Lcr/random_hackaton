@@ -6,6 +6,7 @@ from hero import Hero
 from enemy import Enemy
 import dice
 import slots as slots_mod
+import combat
 from ui import Button
 
 def main():
@@ -19,6 +20,7 @@ def main():
     slots = slots_mod.make_slots()
 
     def roll_all():
+        hero.block = 0
         for s in slots:
             s.clear()
         for d in dice_row:
@@ -26,7 +28,12 @@ def main():
             d.assigned_to = None
             d.return_home()
             d.roll()
-    roll_btn = Button((config.WIDTH // 2 - 100, 500, 200, 60), 'ROULER', on_click=roll_all)
+
+    def end_turn():
+        combat.resolve_player_turn(hero, enemy, slots)
+        roll_all()
+    roll_btn = Button((config.WIDTH // 2 - 220, 500, 200, 60), 'ROULER', on_click=roll_all)
+    end_btn = Button((config.WIDTH // 2 + 20, 500, 200, 60), 'FIN DU TOUR', on_click=end_turn)
     roll_all()
 
     def first_selected():
@@ -40,8 +47,10 @@ def main():
                 running = False
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 running = False
-            roll_btn.enabled = not any((d.rolling for d in dice_row))
-            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and roll_btn.enabled:
+            busy = any((d.rolling for d in dice_row))
+            roll_btn.enabled = not busy
+            end_btn.enabled = not busy and any((s.dice for s in slots))
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and (not busy):
                 for d in dice_row:
                     if d.assigned_to is None and d.contains(event.pos):
                         d.toggle_select()
@@ -54,6 +63,7 @@ def main():
                                 s.accept(sel)
                                 break
             roll_btn.handle(event)
+            end_btn.handle(event)
         for d in dice_row:
             d.update()
         arena.draw(screen, t)
@@ -64,6 +74,7 @@ def main():
         for d in dice_row:
             d.draw(screen)
         roll_btn.draw(screen)
+        end_btn.draw(screen)
         t += 1
         pygame.display.flip()
     pygame.quit()
